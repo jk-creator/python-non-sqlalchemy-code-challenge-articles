@@ -30,7 +30,7 @@ class Article:
             self._magazine = value
         
 class Author:
-    def _init_(self, name = None):
+    def _init_(self, name):
         self.name = name
             
     def get_name(self):
@@ -52,7 +52,11 @@ class Author:
     def add_article(self, magazine, title):
         return Article(self, magazine, title)
     def topic_areas(self):
-        return list(set({magazine.category for magazine in self.magazines()}))
+        first_list = [article.magazine for article in Article.all if article.author is self]
+        if len(first_list) > 0:
+            return list(set([magazine.category for magazine in first_list]))
+        else:
+            return None
 
 class Magazine:
     def _init_(self, name, category):
@@ -83,10 +87,16 @@ class Magazine:
     def contributors(self):
         return list({article.author for article in self.articles()})
     def article_titles(self):
-        return [article.title for article in self.articles()]
+        list_o_titles = [article.title for article in Article.all if article.magazine is self]
+        if len(list_o_titles) > 0:
+            return list_o_titles
+        else:
+            return None
 
     def contributing_authors(self):
-        authors = [article.author for article in self.articles]
-        unique_authors = set(authors)
-        contributing_authors = [author for author in unique_authors if authors.count(author) > 2]
-        return contributing_authors if contributing_authors else None
+        all_contributors = [article.author for article in Article.all if article.magazine is self]
+        for element in all_contributors:
+            if all_contributors.count(element) >= 2:
+                return [element for element in all_contributors]
+            else: 
+                return None
